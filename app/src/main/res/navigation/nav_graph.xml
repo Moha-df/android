@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_search">
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.example.quizzapp.ui.search.SearchFragment"
+        android:label="@string/title_search">
+        <action
+            android:id="@+id/action_search_to_track_detail"
+            app:destination="@id/trackDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist"
+        android:name="com.example.quizzapp.ui.playlist.PlaylistFragment"
+        android:label="@string/title_playlist">
+        <action
+            android:id="@+id/action_playlist_to_playlist_detail"
+            app:destination="@id/playlistDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_quiz"
+        android:name="com.example.quizzapp.ui.quiz.QuizFragment"
+        android:label="@string/title_quiz">
+        <action
+            android:id="@+id/action_quiz_to_quiz_detail"
+            app:destination="@id/quizDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/trackDetailFragment"
+        android:name="com.example.quizzapp.ui.detail.TrackDetailFragment"
+        android:label="Détails">
+        <argument
+            android:name="trackId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistDetailFragment"
+        android:name="com.example.quizzapp.ui.playlist.PlaylistDetailFragment"
+        android:label="Détails de la playlist">
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_playlist_detail_to_track_detail"
+            app:destination="@id/trackDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/quizDetailFragment"
+        android:name="com.example.quizzapp.ui.quiz.QuizDetailFragment"
+        android:label="Détails du Quiz">
+        <argument
+            android:name="quizId"
+            app:argType="long" />
+    </fragment>
+</navigation> 

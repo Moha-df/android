@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MusicalQuiz</string>
+    <string name="title_search">Recherche</string>
+    <string name="title_playlist">Playlists</string>
+    <string name="title_quiz">Quiz</string>
+    <string name="search_hint">Rechercher une musique...</string>
+    <string name="search_button">Rechercher</string>
+    <string name="create_playlist">Créer une playlist</string>
+    <string name="create_quiz">Créer un quiz</string>
+    <string name="play_preview">Écouter l\'extrait</string>
+    <string name="add_to_playlist">Ajouter à la playlist</string>
+    <string name="start_quiz">Commencer le quiz</string>
+    <string name="album_cover">Couverture de l\'album</string>
+</resources>
