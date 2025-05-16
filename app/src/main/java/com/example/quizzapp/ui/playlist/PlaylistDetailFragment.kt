@@ -12,7 +12,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quizzapp.R
 import com.example.quizzapp.databinding.FragmentPlaylistDetailBinding
+import com.example.quizzapp.ui.track.TrackAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -24,7 +26,7 @@ class PlaylistDetailFragment : Fragment() {
 
     private val viewModel: PlaylistDetailViewModel by viewModels()
     private val args: PlaylistDetailFragmentArgs by navArgs()
-    private lateinit var trackAdapter: PlaylistTrackAdapter
+    private lateinit var trackAdapter: TrackAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,21 +39,38 @@ class PlaylistDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         setupRecyclerView()
         observeViewModel()
         viewModel.loadPlaylist(args.playlistId)
     }
 
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
+
     private fun setupRecyclerView() {
-        trackAdapter = PlaylistTrackAdapter(
+        trackAdapter = TrackAdapter(
             onTrackClick = { track ->
-                // Naviguer vers le détail du morceau
-                findNavController().navigate(
-                    PlaylistDetailFragmentDirections.actionPlaylistDetailToTrackDetail(track.id)
-                )
+                viewModel.playTrack(track)
+                Snackbar.make(
+                    binding.root,
+                    "▶️ ${track.title}",
+                    Snackbar.LENGTH_SHORT
+                ).setAnchorView(requireActivity().findViewById(R.id.bottom_navigation))
+                .show()
+            },
+            onLongClick = { track ->
+                viewModel.removeTrackFromPlaylist(track.id)
+                Snackbar.make(
+                    binding.root,
+                    "Piste supprimée de la playlist",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         )
-
         binding.tracksRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = trackAdapter
@@ -62,9 +81,9 @@ class PlaylistDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.playlist.collect { playlist ->
-                        playlist?.let {
-                            binding.playlistNameTextView.text = it.name
+                    viewModel.playlist.collect { playlistWithTracks ->
+                        playlistWithTracks?.let {
+                            binding.playlistNameTextView.text = it.playlist.name
                             trackAdapter.submitList(it.tracks)
                         }
                     }
@@ -89,8 +108,6 @@ class PlaylistDetailFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Libérer les ressources du MediaPlayer
-        trackAdapter.release()
         _binding = null
     }
 } 

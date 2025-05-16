@@ -12,7 +12,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.quizzapp.R
 import com.example.quizzapp.databinding.FragmentSearchBinding
+import com.example.quizzapp.ui.dialog.AddToPlaylistDialog
+import com.example.quizzapp.ui.track.TrackAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -44,12 +47,17 @@ class SearchFragment : Fragment() {
     private fun setupRecyclerView() {
         trackAdapter = TrackAdapter(
             onTrackClick = { track ->
-                findNavController().navigate(
-                    SearchFragmentDirections.actionSearchToTrackDetail(track.id)
-                )
+                viewModel.playTrack(track)
+                Snackbar.make(
+                    binding.root,
+                    "▶️ ${track.title}",
+                    Snackbar.LENGTH_SHORT
+                ).setAnchorView(requireActivity().findViewById(R.id.bottom_navigation))
+                .show()
             },
-            onTrackLongClick = { track ->
-                // TODO: Afficher un dialogue pour choisir la playlist
+            onLongClick = { track ->
+                AddToPlaylistDialog.newInstance(track.id)
+                    .show(childFragmentManager, "add_to_playlist")
             }
         )
 
@@ -73,7 +81,7 @@ class SearchFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.tracks.collect { tracks ->
+                    viewModel.searchResults.collect { tracks ->
                         trackAdapter.submitList(tracks)
                     }
                 }
@@ -87,7 +95,9 @@ class SearchFragment : Fragment() {
                 launch {
                     viewModel.error.collect { error ->
                         error?.let {
-                            Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
+                                .setAnchorView(requireActivity().findViewById(R.id.bottom_navigation))
+                                .show()
                         }
                     }
                 }

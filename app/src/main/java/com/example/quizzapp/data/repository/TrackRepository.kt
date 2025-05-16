@@ -26,4 +26,13 @@ class TrackRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun getRefreshedTrack(track: Track): Result<Track> = withContext(Dispatchers.IO) {
+        try {
+            val refreshedTrack = deezerService.getTrack(track.id)
+            Result.success(refreshedTrack)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 } 

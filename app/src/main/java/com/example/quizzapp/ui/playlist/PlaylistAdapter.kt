@@ -5,12 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.quizzapp.data.model.Playlist
+import com.example.quizzapp.data.model.PlaylistWithTracks
 import com.example.quizzapp.databinding.ItemPlaylistBinding
 
 class PlaylistAdapter(
-    private val onPlaylistClick: (Playlist) -> Unit
-) : ListAdapter<Playlist, PlaylistAdapter.PlaylistViewHolder>(PlaylistDiffCallback()) {
+    private val onPlaylistClick: (PlaylistWithTracks) -> Unit,
+    private val onPlaylistLongClick: (PlaylistWithTracks) -> Unit
+) : ListAdapter<PlaylistWithTracks, PlaylistAdapter.PlaylistViewHolder>(PlaylistDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         val binding = ItemPlaylistBinding.inflate(
@@ -36,20 +37,30 @@ class PlaylistAdapter(
                     onPlaylistClick(getItem(position))
                 }
             }
+
+            binding.root.setOnLongClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onPlaylistLongClick(getItem(position))
+                    true
+                } else {
+                    false
+                }
+            }
         }
 
-        fun bind(playlist: Playlist) {
-            binding.playlistNameTextView.text = playlist.name
-            binding.trackCountTextView.text = "${playlist.tracks.size} titres"
+        fun bind(playlist: PlaylistWithTracks) {
+            binding.playlistNameTextView.text = playlist.playlist.name
+            binding.trackCountTextView.text = "${playlist.tracks.size} pistes"
         }
     }
 
-    private class PlaylistDiffCallback : DiffUtil.ItemCallback<Playlist>() {
-        override fun areItemsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
-            return oldItem.id == newItem.id
+    private class PlaylistDiffCallback : DiffUtil.ItemCallback<PlaylistWithTracks>() {
+        override fun areItemsTheSame(oldItem: PlaylistWithTracks, newItem: PlaylistWithTracks): Boolean {
+            return oldItem.playlist.id == newItem.playlist.id
         }
 
-        override fun areContentsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
+        override fun areContentsTheSame(oldItem: PlaylistWithTracks, newItem: PlaylistWithTracks): Boolean {
             return oldItem == newItem
         }
     }

@@ -40,18 +40,15 @@ class QuizFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupFab()
-        observeViewModel()
+        observeQuizzes()
     }
 
     private fun setupRecyclerView() {
         quizAdapter = QuizAdapter(
             onQuizClick = { quiz ->
-                findNavController().navigate(
-                    QuizFragmentDirections.actionQuizToQuizDetail(quiz.id)
-                )
+                // TODO: Implémenter la navigation vers le détail du quiz
             }
         )
-
         binding.quizzesRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = quizAdapter
@@ -88,27 +85,11 @@ class QuizFragment : Fragment() {
             .show()
     }
 
-    private fun observeViewModel() {
+    private fun observeQuizzes() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.quizzes.collect { quizzes ->
-                        quizAdapter.submitList(quizzes)
-                    }
-                }
-
-                launch {
-                    viewModel.isLoading.collect { isLoading ->
-                        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-                    }
-                }
-
-                launch {
-                    viewModel.error.collect { error ->
-                        error?.let {
-                            Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
-                        }
-                    }
+                viewModel.quizzes.collect { quizzes ->
+                    quizAdapter.submitList(quizzes)
                 }
             }
         }

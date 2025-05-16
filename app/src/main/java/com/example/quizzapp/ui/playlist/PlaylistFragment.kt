@@ -11,7 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quizzapp.data.model.PlaylistWithTracks
 import com.example.quizzapp.databinding.FragmentPlaylistBinding
+import com.example.quizzapp.ui.dialog.CreatePlaylistDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -38,73 +40,61 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        setupFab()
-        observeViewModel()
+        setupClickListeners()
+        observePlaylists()
     }
 
     private fun setupRecyclerView() {
         playlistAdapter = PlaylistAdapter(
-            onPlaylistClick = { playlist ->
+            onPlaylistClick = { playlistWithTracks ->
                 findNavController().navigate(
-                    PlaylistFragmentDirections.actionPlaylistToPlaylistDetail(playlist.id)
+                    PlaylistFragmentDirections.actionPlaylistToPlaylistDetail(playlistWithTracks.playlist.id)
                 )
+            },
+            onPlaylistLongClick = { playlistWithTracks ->
+                showDeleteConfirmationDialog(playlistWithTracks)
             }
         )
-
         binding.playlistsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = playlistAdapter
         }
     }
 
-    private fun setupFab() {
+    private fun setupClickListeners() {
         binding.createPlaylistFab.setOnClickListener {
             showCreatePlaylistDialog()
         }
     }
 
-    private fun showCreatePlaylistDialog() {
-        val editText = TextInputEditText(requireContext()).apply {
-            hint = "Nom de la playlist"
-        }
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Créer une playlist")
-            .setView(editText)
-            .setPositiveButton("Créer") { _, _ ->
-                val name = editText.text?.toString()
-                if (!name.isNullOrBlank()) {
-                    viewModel.createPlaylist(name)
-                }
-            }
-            .setNegativeButton("Annuler", null)
-            .show()
-    }
-
-    private fun observeViewModel() {
+    private fun observePlaylists() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.playlists.collect { playlists ->
-                        playlistAdapter.submitList(playlists)
-                    }
-                }
-
-                launch {
-                    viewModel.isLoading.collect { isLoading ->
-                        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-                    }
-                }
-
-                launch {
-                    viewModel.error.collect { error ->
-                        error?.let {
-                            Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
-                        }
-                    }
+                viewModel.playlists.collect { playlists ->
+                    playlistAdapter.submitList(playlists)
                 }
             }
         }
+    }
+
+    private fun showCreatePlaylistDialog() {
+        CreatePlaylistDialog().show(parentFragmentManager, "create_playlist")
+    }
+
+    private fun showDeleteConfirmationDialog(playlistWithTracks: PlaylistWithTracks) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Supprimer la playlist")
+            .setMessage("Êtes-vous sûr de vouloir supprimer la playlist \"${playlistWithTracks.playlist.name}\" ?")
+            .setPositiveButton("Oui") { _, _ ->
+                viewModel.deletePlaylist(playlistWithTracks.playlist.id)
+                Snackbar.make(
+                    binding.root,
+                    "Playlist supprimée",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton("Non", null)
+            .show()
     }
 
     override fun onDestroyView() {

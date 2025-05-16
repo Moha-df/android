@@ -2,15 +2,46 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/navigation_search">
+    app:startDestination="@id/navigation_quiz">
+
+    <fragment
+        android:id="@+id/navigation_quiz"
+        android:name="com.example.quizzapp.ui.quiz.QuizFragment"
+        android:label="@string/title_quiz">
+        <action
+            android:id="@+id/action_quiz_to_search"
+            app:destination="@id/navigation_search"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_quiz_to_playlist"
+            app:destination="@id/navigation_playlist"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_search"
         android:name="com.example.quizzapp.ui.search.SearchFragment"
         android:label="@string/title_search">
         <action
-            android:id="@+id/action_search_to_track_detail"
-            app:destination="@id/trackDetailFragment" />
+            android:id="@+id/action_search_to_quiz"
+            app:destination="@id/navigation_quiz"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_search_to_playlist"
+            app:destination="@id/navigation_playlist"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <fragment
@@ -18,18 +49,43 @@
         android:name="com.example.quizzapp.ui.playlist.PlaylistFragment"
         android:label="@string/title_playlist">
         <action
+            android:id="@+id/action_playlist_to_quiz"
+            app:destination="@id/navigation_quiz"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_playlist_to_search"
+            app:destination="@id/navigation_search"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
             android:id="@+id/action_playlist_to_playlist_detail"
-            app:destination="@id/playlistDetailFragment" />
+            app:destination="@id/playlistDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/navigation_playlist"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_quiz"
-        android:name="com.example.quizzapp.ui.quiz.QuizFragment"
-        android:label="@string/title_quiz">
-        <action
-            android:id="@+id/action_quiz_to_quiz_detail"
-            app:destination="@id/quizDetailFragment" />
+        android:id="@+id/playlistDetailFragment"
+        android:name="com.example.quizzapp.ui.playlist.PlaylistDetailFragment"
+        android:label="@string/title_playlist_detail">
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_now_playing"
+        android:name="com.example.quizzapp.ui.nowplaying.NowPlayingFragment"
+        android:label="@string/title_now_playing" />
 
     <fragment
         android:id="@+id/trackDetailFragment"
@@ -38,18 +94,6 @@
         <argument
             android:name="trackId"
             app:argType="string" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/playlistDetailFragment"
-        android:name="com.example.quizzapp.ui.playlist.PlaylistDetailFragment"
-        android:label="Détails de la playlist">
-        <argument
-            android:name="playlistId"
-            app:argType="long" />
-        <action
-            android:id="@+id/action_playlist_detail_to_track_detail"
-            app:destination="@id/trackDetailFragment" />
     </fragment>
 
     <fragment

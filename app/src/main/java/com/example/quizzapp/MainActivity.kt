@@ -19,6 +19,18 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
+
+        // Configuration de la barre de navigation
         binding.bottomNavigation.setupWithNavController(navController)
+
+        // Gestion de la sélection dans la barre de navigation
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.playlistDetailFragment -> {
+                    // Quand on est dans une playlist détaillée, on sélectionne l'onglet Playlists
+                    binding.bottomNavigation.menu.findItem(R.id.navigation_playlist)?.isChecked = true
+                }
+            }
+        }
     }
 }

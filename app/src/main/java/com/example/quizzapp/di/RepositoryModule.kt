@@ -23,8 +23,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providePlaylistRepository(playlistDao: PlaylistDao): PlaylistRepository {
-        return PlaylistRepository(playlistDao)
+    fun providePlaylistRepository(playlistDao: PlaylistDao, deezerService: DeezerService): PlaylistRepository {
+        return PlaylistRepository(playlistDao, deezerService)
     }
 
     @Provides

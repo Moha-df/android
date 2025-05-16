@@ -3,6 +3,7 @@ package com.example.quizzapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.quizzapp.data.local.AppDatabase
+import com.example.quizzapp.data.local.MIGRATION_1_2
 import com.example.quizzapp.data.local.PlaylistDao
 import com.example.quizzapp.data.local.QuizDao
 import dagger.Module
@@ -24,7 +25,9 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "musical_quiz_database"
-        ).build()
+        )
+        .addMigrations(MIGRATION_1_2)
+        .build()
     }
 
     @Provides

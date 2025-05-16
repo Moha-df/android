@@ -14,4 +14,9 @@
         android:id="@+id/navigation_quiz"
         android:icon="@drawable/ic_quiz"
         android:title="@string/title_quiz" />
+
+    <item
+        android:id="@+id/navigation_now_playing"
+        android:icon="@drawable/ic_now_playing"
+        android:title="@string/title_now_playing" />
 </menu> 
