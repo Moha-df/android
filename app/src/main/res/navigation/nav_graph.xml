@@ -104,4 +104,21 @@
             android:name="quizId"
             app:argType="long" />
     </fragment>
+
+    <fragment
+        android:id="@+id/playQuizFragment"
+        android:name="com.example.quizzapp.ui.quiz.PlayQuizFragment"
+        android:label="Jouer au quiz">
+        <argument
+            android:name="quizId"
+            app:argType="long" />
+    </fragment>
+
+    <action
+        android:id="@+id/actionQuizFragmentToPlayQuizFragment"
+        app:destination="@id/playQuizFragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation> 

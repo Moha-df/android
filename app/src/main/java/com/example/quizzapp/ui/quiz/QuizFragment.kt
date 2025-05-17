@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -11,12 +12,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quizzapp.R
 import com.example.quizzapp.data.model.GameMode
+import com.example.quizzapp.data.model.Quiz
 import com.example.quizzapp.databinding.FragmentQuizBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.quizzapp.ui.dialog.CreateQuizDialog
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -41,12 +45,19 @@ class QuizFragment : Fragment() {
         setupRecyclerView()
         setupFab()
         observeQuizzes()
+        observeErrors()
+        setupNavigation()
     }
 
     private fun setupRecyclerView() {
         quizAdapter = QuizAdapter(
             onQuizClick = { quiz ->
-                // TODO: Implémenter la navigation vers le détail du quiz
+                findNavController().navigate(
+                    QuizFragmentDirections.actionQuizFragmentToPlayQuizFragment(quiz.id)
+                )
+            },
+            onQuizLongClick = { quiz ->
+                showDeleteConfirmationDialog(quiz)
             }
         )
         binding.quizzesRecyclerView.apply {
@@ -62,24 +73,26 @@ class QuizFragment : Fragment() {
     }
 
     private fun showCreateQuizDialog() {
-        val nameEditText = TextInputEditText(requireContext()).apply {
-            hint = "Nom du quiz"
+        val dialog = CreateQuizDialog().apply {
+            setPlaylists(viewModel.playlists.value)
+            setOnQuizCreatedListener { name, playlistId ->
+                viewModel.createQuiz(
+                    name = name,
+                    playlistId = playlistId,
+                    gameMode = GameMode.MULTIPLE_CHOICE,
+                    timeLimit = 30
+                )
+            }
         }
+        dialog.show(childFragmentManager, CreateQuizDialog.TAG)
+    }
 
+    private fun showDeleteConfirmationDialog(quiz: Quiz) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Créer un quiz")
-            .setView(nameEditText)
-            .setPositiveButton("Créer") { _, _ ->
-                val name = nameEditText.text?.toString()
-                if (!name.isNullOrBlank()) {
-                    // TODO: Afficher un dialogue pour choisir la playlist et le mode de jeu
-                    viewModel.createQuiz(
-                        name = name,
-                        playlistId = 1L, // TODO: Récupérer l'ID de la playlist sélectionnée
-                        gameMode = GameMode.MULTIPLE_CHOICE,
-                        timeLimit = 30
-                    )
-                }
+            .setTitle("Supprimer le quiz")
+            .setMessage("Êtes-vous sûr de vouloir supprimer ce quiz ?")
+            .setPositiveButton("Supprimer") { _, _ ->
+                viewModel.deleteQuiz(quiz)
             }
             .setNegativeButton("Annuler", null)
             .show()
@@ -91,6 +104,27 @@ class QuizFragment : Fragment() {
                 viewModel.quizzes.collect { quizzes ->
                     quizAdapter.submitList(quizzes)
                 }
+            }
+        }
+    }
+
+    private fun observeErrors() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.error.collect { error ->
+                    error?.let {
+                        Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+                        viewModel.clearError()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupNavigation() {
+        findNavController().addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.navigation_quiz) {
+                viewModel.clearError()
             }
         }
     }

@@ -10,7 +10,8 @@ import com.example.quizzapp.data.model.Quiz
 import com.example.quizzapp.databinding.ItemQuizBinding
 
 class QuizAdapter(
-    private val onQuizClick: (Quiz) -> Unit
+    private val onQuizClick: (Quiz) -> Unit,
+    private val onQuizLongClick: (Quiz) -> Unit
 ) : ListAdapter<Quiz, QuizAdapter.QuizViewHolder>(QuizDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder {
@@ -31,21 +32,27 @@ class QuizAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.setOnClickListener {
-                val position = adapterPosition
+            binding.quizCard.setOnClickListener {
+                val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     onQuizClick(getItem(position))
+                }
+            }
+
+            binding.quizCard.setOnLongClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onQuizLongClick(getItem(position))
+                    true
+                } else {
+                    false
                 }
             }
         }
 
         fun bind(quiz: Quiz) {
-            binding.quizNameTextView.text = quiz.name
-            binding.quizModeTextView.text = when (quiz.gameMode) {
-                GameMode.MULTIPLE_CHOICE -> "Mode: Choix multiples"
-                GameMode.FILL_IN_BLANKS -> "Mode: Lettres manquantes"
-            }
-            binding.quizTimeLimitTextView.text = quiz.timeLimit?.let { "Temps: ${it}s" } ?: "Temps: illimité"
+            binding.quizTitleTextView.text = quiz.name
+            binding.playlistNameTextView.text = "Playlist: ${quiz.playlistName ?: "Non spécifiée"}"
         }
     }
 

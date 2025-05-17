@@ -17,11 +17,13 @@ class QuizRepository(private val quizDao: QuizDao) {
         name: String,
         playlistId: Long,
         gameMode: GameMode = GameMode.MULTIPLE_CHOICE,
-        timeLimit: Int? = null
+        timeLimit: Int? = null,
+        playlistName: String
     ): Long {
         val quiz = Quiz(
             name = name,
             playlistId = playlistId,
+            playlistName = playlistName,
             gameMode = gameMode,
             timeLimit = timeLimit
         )

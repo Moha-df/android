@@ -20,8 +20,10 @@ data class Quiz(
     val id: Long = 0,
     val name: String,
     val playlistId: Long,
+    val playlistName: String? = null,
     val gameMode: GameMode = GameMode.MULTIPLE_CHOICE,
-    val timeLimit: Int? = null // en secondes, null = pas de limite
+    val timeLimit: Int? = null,
+    val createdAt: Long = System.currentTimeMillis()
 )
 
 enum class GameMode {
